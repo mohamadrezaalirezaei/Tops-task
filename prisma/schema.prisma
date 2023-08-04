@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User{
+  id                                        Int @id @default(autoincrement())
+  name                                      String 
+  phone                                     String
+  email                                     String @unique
+  password                                  String
+  createdAt                                 DateTime @default(now())
+  updatedAt                                 DateTime @updatedAt
+  role                                      Role
+  posts                                     Post[]                                       
+  comments                                  Comment[]
+} 
+
+model Post{
+  id                                        Int @id @default(autoincrement())
+  title                                     String
+  content                                   String
+  publicationDate                           DateTime @default(now())
+  updatedAt                                 DateTime @updatedAt
+  tags                                      String[]
+  authorId                                  Int
+  author                                    User @relation(fields: [authorId], references: [id])
+  comments                                  Comment[]
+
+  @@index([publicationDate, authorId])
+
+}
+
+
+model Comment {
+  id                                        Int @id @default(autoincrement())
+  content                                   String
+  postId                                    Int
+  post                                      Post @relation(fields: [postId], references: [id])
+  authorId                                  Int
+  author                                    User @relation(fields: [authorId], references: [id]) 
+  createdAt                                 DateTime @default(now())
+  updatedAt                                 DateTime @updatedAt()
+
+    @@index([createdAt, authorId, postId])
+
+}
+
+enum Role{  
+  USER
+  ADMIN  
+}
