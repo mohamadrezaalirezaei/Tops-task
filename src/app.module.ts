@@ -9,7 +9,6 @@ import { UserInterceptor } from './user/interceptors/user.interceptor';
 import { CommentModule } from './comment/comment.module';
 import { AuthGuard } from './guards/auth.guard';
 import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
-import { redisStore } from 'cache-manager-redis-store';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 // import * as redisStore from 'cache-manager-redis-store';

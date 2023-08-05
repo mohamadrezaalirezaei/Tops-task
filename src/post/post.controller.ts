@@ -80,6 +80,7 @@ export class PostController {
     @Query('limit') limit?: number,
     @Query('sortBy') sortBy?: string,
     @Query('sortOrder') sortOrder?: 'asc' | 'desc',
+    @Query('fields') fields?: string,
   ) {
     const filter = {
       ...(title && { title: title }),
@@ -87,6 +88,7 @@ export class PostController {
       ...(tags && { tags: tags.split(',') }),
       ...(sortBy && { sortBy: sortBy }),
       ...(sortOrder && { sortOrder: sortOrder }),
+      ...(fields && { fields: fields.split(',') }),
     };
 
     const requestedPage = page && !isNaN(Number(page)) ? Number(page) : 1;

@@ -96,6 +96,9 @@ export class CommentService {
         authorId: true,
       },
     });
+    if (!author) {
+      throw new HttpException('Comment not found', HttpStatus.NOT_FOUND);
+    }
     return author.authorId;
   }
 }

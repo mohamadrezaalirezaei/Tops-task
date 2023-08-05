@@ -8,7 +8,7 @@ import { Role } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
-import { loginDto } from '../dto/auth.dto';
+import { loginDto, userDecorator } from '../dto/auth.dto';
 
 interface registerBody {
   name: string;
@@ -80,5 +80,17 @@ export class AuthService {
       expiresIn: 360000,
     });
     return token;
+  }
+
+  async getLoggedInUser(user: userDecorator) {
+    const userInfo = this.prismaService.user.findUnique({
+      where: {
+        id: user.id,
+      },
+    });
+    if (!userInfo) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return userInfo;
   }
 }

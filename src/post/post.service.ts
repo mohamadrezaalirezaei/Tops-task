@@ -1,5 +1,12 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Injectable, NotFoundException, Logger, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  Logger,
+  Inject,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { userDecorator } from 'src/user/dto/auth.dto';
@@ -81,24 +88,7 @@ export class PostService {
     console.log(cachedItem);
     return { numberOfRecords: posts.length, posts, page, limit };
   }
-  async createPost({ title, tags, content }: bodyPost, user: userDecorator) {
-    const post = await this.prismaService.post.create({
-      data: {
-        title,
-        tags,
-        content,
-        authorId: user.id,
-      },
-    });
-    return post;
-  }
-  createSelectObject(fields: string[]) {
-    const selectObj: any = {};
-    fields.forEach((field) => {
-      selectObj[field] = true;
-    });
-    return selectObj;
-  }
+
   async getAllPostForAdmin(
     filter: GetPostsParam,
     offset: number,
@@ -117,18 +107,22 @@ export class PostService {
         hasSome: filter.tags,
       };
     }
+    const selectFields = filter.fields;
+
     const post = await this.prismaService.post.findMany({
-      select: {
-        id: true,
-        title: true,
-        publicationDate: true,
-        updatedAt: true,
-        content: true,
-        tags: true,
-        authorId: true,
-        comments: true,
-        author: true,
-      },
+      select: selectFields
+        ? this.createSelectObject(selectFields)
+        : {
+            id: true,
+            title: true,
+            publicationDate: true,
+            updatedAt: true,
+            content: true,
+            tags: true,
+            authorId: true,
+            comments: true,
+            author: true,
+          },
       where: where,
       skip: offset,
       take: limit,
@@ -137,6 +131,25 @@ export class PostService {
       },
     });
     return { numberOfRecords: post.length, post, page, limit };
+  }
+
+  async createPost({ title, tags, content }: bodyPost, user: userDecorator) {
+    const post = await this.prismaService.post.create({
+      data: {
+        title,
+        tags,
+        content,
+        authorId: user.id,
+      },
+    });
+    return post;
+  }
+  createSelectObject(fields: string[]) {
+    const selectObj: any = {};
+    fields.forEach((field) => {
+      selectObj[field] = true;
+    });
+    return selectObj;
   }
 
   async getPostById(postId: number) {
@@ -198,6 +211,9 @@ export class PostService {
         author: true,
       },
     });
+    if (!author) {
+      throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
+    }
     return author.author.id;
   }
 }
