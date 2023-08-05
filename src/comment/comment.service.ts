@@ -41,10 +41,13 @@ export class CommentService {
     };
   }
 
-  async getAllComments(user: userDecorator) {
-    return this.prismaService.comment.findMany({
+  async getAllCommentsForPost(postId: number) {
+    return this.prismaService.post.findMany({
       where: {
-        id: user.id,
+        id: postId,
+      },
+      select: {
+        comments: true,
       },
     });
   }

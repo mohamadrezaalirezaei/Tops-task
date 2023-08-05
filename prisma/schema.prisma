@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -54,7 +55,8 @@ model Comment {
 
 }
 
-enum Role{  
+
+enum Role {  
   USER
   ADMIN  
 }

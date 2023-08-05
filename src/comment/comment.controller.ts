@@ -15,6 +15,7 @@ import { AddCommentBodyDto, UpdateCommentBodyDto } from './Dto/comment.dto';
 import { User } from 'src/user/decorators/user.decorator';
 import { userDecorator } from 'src/user/dto/auth.dto';
 import { Roles } from 'src/decorators/roles.decorators';
+import { PostService } from 'src/post/post.service';
 import { Role } from '@prisma/client';
 
 @Controller('comment')
@@ -33,9 +34,9 @@ export class CommentController {
 
   //fix get all comment for own post
   @Roles(Role.ADMIN, Role.USER)
-  @Get()
-  async getAllComments(@User() user: userDecorator) {
-    return this.commentService.getAllComments(user);
+  @Get(':id')
+  async getAllCommentsForPost(@Param('id', ParseIntPipe) postId: number) {
+    return this.commentService.getAllCommentsForPost(postId);
   }
 
   @Roles(Role.ADMIN, Role.USER)
