@@ -34,6 +34,18 @@ export class registerDto {
   role: Role;
 }
 
+export class updatePasswordDto {
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(8)
+  password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(8)
+  password2: string;
+}
+
 export class loginDto {
   @IsString()
   @IsNotEmpty()

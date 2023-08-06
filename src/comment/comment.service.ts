@@ -42,7 +42,15 @@ export class CommentService {
   }
 
   async getAllCommentsForPost(postId: number) {
-    return this.prismaService.post.findMany({
+    const post = await this.prismaService.post.findUnique({
+      where: {
+        id: postId,
+      },
+    });
+    if (!post) {
+      throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
+    }
+    const comments = await this.prismaService.post.findMany({
       where: {
         id: postId,
       },
@@ -50,6 +58,11 @@ export class CommentService {
         comments: true,
       },
     });
+
+    if (!comments) {
+      throw new HttpException('comments not found', HttpStatus.NOT_FOUND);
+    }
+    return comments;
   }
 
   async updateComment(body: UpdatecommentBody, commentId: number) {

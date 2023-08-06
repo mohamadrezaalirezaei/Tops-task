@@ -10,6 +10,11 @@ import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { loginDto, userDecorator } from '../dto/auth.dto';
 
+interface UpdatePassword {
+  password: string;
+  password2: string;
+}
+
 interface registerBody {
   name: string;
   phone: string;
@@ -92,5 +97,34 @@ export class AuthService {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
     return userInfo;
+  }
+
+  async updatePassword(body: UpdatePassword, user: userDecorator) {
+    const userInfo = await this.prismaService.user.findUnique({
+      where: {
+        id: user.id,
+      },
+    });
+    if (!userInfo) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (body.password !== body.password2) {
+      throw new HttpException(
+        'Your passwords doesnt match',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const hashedPassword = await bcrypt.hash(body.password, 10);
+
+    await this.prismaService.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        password: hashedPassword,
+      },
+    });
+    return 'Your password successfully changed';
   }
 }

@@ -154,7 +154,6 @@ describe('PostService', () => {
       expect(result.title).toBe(updateBody.title); // Check if the post title is updated
       expect(result.tags).toEqual(updateBody.tags); // Check if the post tags are updated
       expect(result.content).toBe(updateBody.content); // Check if the post content is updated
-      // Add more expectations as needed for other properties
       expect(prismaService.post.findUnique).toBeCalledWith({
         where: { id: postId },
       }); // Check if findUnique was called with the correct postId
@@ -183,6 +182,70 @@ describe('PostService', () => {
       expect(prismaService.post.findUnique).toBeCalledWith({
         where: { id: postId },
       }); // Check if findUnique was called with the correct postId
+    });
+  });
+
+  describe('getAllPostForAdmin', () => {
+    it('should get all posts for admin', async () => {
+      // Mock the request query parameters
+      const title = 'Test Post';
+      const authorId = 1;
+      const tags = 'tag1,tag2';
+      const page = 1;
+      const limit = 10;
+      const sortBy = 'publicationDate';
+      const sortOrder = 'desc';
+
+      // Mock the filter object
+      const filter = {
+        title,
+        authorId,
+        tags: tags.split(','),
+        page,
+        limit,
+        sortBy,
+        sortOrder,
+      };
+
+      // Mock the PrismaService findMany method to return an array of posts
+      jest.spyOn(prismaService.post, 'findMany').mockResolvedValue([
+        // Add mock posts here (as per your requirement)
+        {
+          id: 1,
+          title: 'Test Post 1',
+          publicationDate: new Date(),
+          updatedAt: new Date(),
+          content: 'This is test post content 1.',
+          tags: ['tag1', 'tag2'],
+          authorId: 1,
+        },
+        {
+          id: 2,
+          title: 'Test Post 2',
+          publicationDate: new Date(),
+          updatedAt: new Date(),
+          content: 'This is test post content 2.',
+          tags: ['tag3', 'tag4'],
+          authorId: 2,
+        },
+      ]);
+
+      // Call the getAllPostForAdmin method
+      const result = await postService.getAllPostForAdmin(
+        filter,
+        0,
+        limit,
+        page,
+        sortBy,
+        sortOrder,
+      );
+
+      // Expectations
+      expect(result).toBeDefined(); // Check if the result is defined (not null or undefined)
+      expect(result.numberOfRecords).toBe(2); // Check if the number of records is correct (number of mocked posts)
+      expect(result.post).toHaveLength(2); // Check if the number of posts returned is correct
+      expect(result.page).toBe(page); // Check if the page number is correct
+      expect(result.limit).toBe(limit); // Check if the limit per page is correct
     });
   });
 });

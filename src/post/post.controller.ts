@@ -133,7 +133,7 @@ export class PostController {
     const authorId = await this.postService.getAuthorOfPost(user, postId);
     if (user.id !== authorId && user.role !== Role.ADMIN)
       throw new HttpException(
-        'Unauthorized, You nou are not the author of this post!',
+        'Unauthorized, You are not the author of this post!',
         HttpStatus.UNAUTHORIZED,
       );
     return this.postService.deletePost(postId);
@@ -149,7 +149,7 @@ export class PostController {
     const authorId = await this.postService.getAuthorOfPost(user, postId);
     if (user.id !== authorId && user.role !== Role.ADMIN)
       throw new HttpException(
-        'Unauthorized, You nou are not the author of this post!',
+        'Unauthorized, You are not the author of this post!',
         HttpStatus.UNAUTHORIZED,
       );
     return this.postService.updatePost(postId, body);

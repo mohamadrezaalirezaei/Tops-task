@@ -1,6 +1,11 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { loginDto, registerDto, userDecorator } from '../dto/auth.dto';
+import {
+  loginDto,
+  registerDto,
+  updatePasswordDto,
+  userDecorator,
+} from '../dto/auth.dto';
 import { User } from '../decorators/user.decorator';
 import { Roles } from 'src/decorators/roles.decorators';
 import { Role } from '@prisma/client';
@@ -23,5 +28,14 @@ export class AuthController {
   @Get('/loggedInUser')
   async getLoggedInUser(@User() user: userDecorator) {
     return this.authService.getLoggedInUser(user);
+  }
+
+  @Roles(Role.ADMIN, Role.USER)
+  @Put('updatePassword')
+  async updatePassword(
+    @Body() body: updatePasswordDto,
+    @User() user: userDecorator,
+  ) {
+    return this.authService.updatePassword(body, user);
   }
 }
